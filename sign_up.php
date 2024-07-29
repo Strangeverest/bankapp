@@ -2,18 +2,18 @@
 header("Access-Control-Allow-Origin: * ");
 session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $firstName          = $_POST['firstName'];
-    $lastName           = $_POST['lastName'];
-    $number             = $_POST['number'];
-    $email              = $_POST['email'];
-    $password           = $_POST['password'];
-    $confirmPassword    = $_POST['confirmPassword'];
+    $firstName              = $_POST['firstName'];
+    $lastName               = $_POST['lastName'];
+    $number                 = $_POST['number'];
+    $email                  = $_POST['email'];
+    $password               = $_POST['password'];
+    $confirmPassword        = $_POST['confirmPassword'];
 
     // Validate input
     if (empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($confirmPassword) || empty($number)) {
         echo json_encode([
-            'success' => false,
-            'message' => 'All fields are required!'
+            'success'       => false,
+            'message'       => 'All fields are required!'
         ]);
         return;
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -35,24 +35,115 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ]);
         return;
     } else {
+        // hash number
+        $hashNumber = md5($number);
+       
+       $otp = rand(1000,9999);
+
+        $postData = $_POST;
+        $postData['hashedNumber'] = $hashNumber;
+       
         // write input to file
-        $newFile = 'data.txt';
-        $file = fopen("$newFile", "a");
-        $data = "First Name: $firstName,Last Name: $lastName,Email: $email,Phone Number: $number,Password: $password";
-        $dataExploded = explode(",", $data);
-        $jsonEncodeData = json_encode($dataExploded);
-        fwrite($file, $jsonEncodeData . "\n");
-        fclose($file);
+        function writeToFile($firstName, $lastName, $email, $number, $password, $confirmPassword, $hashNumber,$otp)
+        {
+            $newFile = 'data.txt';
+            $file = fopen("$newFile", "a");
+            fwrite($file, $firstName . "\n");
+            fwrite($file, $lastName . "\n");
+            fwrite($file, $email . "\n");
+            fwrite($file, $number . "\n");
+            fwrite($file, $password . "\n");
+            fwrite($file, $confirmPassword . "\n");
+            fwrite($file, $hashNumber . "\n");
+            fwrite($file, $otp . "\n");
+            
+            fclose($file);
+        }
+        function readFromFile()
+        {
+            $newFile = 'data.txt';
+            $file = fopen("$newFile", "r");
+            $data = [];
+            while (($line = fgets($file)) !== false) {
+                $data[] = trim($line);
+            }
+            fclose($file);
+            return $data;
+        }
+        $data = readFromFile();
+        if (in_array($email, $data) || in_array($number, $data)) {
+            echo json_encode([
+                'status' => false,
+                'message' => 'user already exists!'
+            ]);
+            exit();
+        }
+        writeToFile($firstName, $lastName, $email, $number, $password, $confirmPassword, $hashNumber, $otp);
+
         echo json_encode([
-            'success' => true,
+            'status' => true,
             'message' => 'Registeration Successful!',
+            // 'token' => $hashNumber,
+
+            // $postData["hashedNumber"]
 
         ]);
-
-        return;
-        // add inputs to array
-        // $users[] = ['firstName' => $firstName, 'lastName' => $lastName, 'email' => $email, 'number' => $number, 'password' => $password];
-
+        return header("location:loginindex.php");
         exit();
     }
+    // get each user with hashed number
+    // function getUserByHashNumber($hashNumber,   $firstName,$lastName,$email)
+    // {
+    //     $data = readFromFile();
+    //     if (in_array($hashNumber, $data)) {
+    //         echo json_encode([
+    //             'status' => true,
+    //             'message' => 'user found!',
+    //             'userDetails' => "<pre>  $firstName,$lastName,$email</pre>"
+    //         ]);
+    //         exit();
+    //     }else{
+    //         echo json_encode([
+    //             'status' => false,
+    //             'message' => 'user not found!'
+    //         ]);
+    //         exit();
+    //     }
+
+
+    // $data = readFromFile();
+    // $userData = [];
+    // foreach ($data as $key => $value) {
+    //     if ($key % 6 === 5 && $value === $hashNumber) {
+    //         $userData[] = [
+    //             'firstName' => $data[$key - 5],
+    //             'lastName' => $data[$key - 4],
+    //             'email' => $data[$key - 3],
+    //             'number' => $data[$key - 2],
+    //             'password' => $data[$key - 1],
+    //             'confirmPassword' => $data[$key]
+    //         ];
+    //     }
+    // }
+    // return $userData;
+
+        // search user by hashed number
+    // function searchUser($searchNumber)
+    // {
+    //     $userData = getUserByHashNumber($searchNumber);
+    //     if (empty($userData)) {
+    //         echo json_encode([
+    //             'status' => false,
+    //             'message' => 'No user found!'
+    //         ]);
+    //         exit();
+    //     }
+    //     echo json_encode([
+    //         'status' => true,
+    //         'message' => 'User found!',
+    //         'userData' => $userData
+    //     ]);
+    //     exit();
+    // }
+
 }

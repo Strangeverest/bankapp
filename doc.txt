@@ -1,0 +1,39 @@
+Here is the documentation of the code in a text format:
+
+Registeration Script
+
+This script handles user registration by validating input data and storing it in a file.
+
+Functionality
+
+The script allows cross-origin requests by setting the Access-Control-Allow-Origin header to *.
+It starts a new session using the session_start() function.
+The script checks if the request method is POST. If it is, it proceeds to validate the input data.
+The script validates the input data by checking if any of the fields are empty. If any field is empty, it returns an error message.
+It then checks if the email format is valid using the filter_var() function. If the email format is invalid, it returns an error message.
+The script checks if the password meets the requirements (at least 8 characters long, contains at least one uppercase letter, one lowercase letter, one number, and one special character). If the password does not meet the requirements, it returns an error message.
+It then checks if the passwords match. If they do not match, it returns an error message.
+If all the validation checks pass, the script hashes the number using the md5() function and creates an array of the posted data.
+The script writes the data to a file named data.txt in JSON format.
+Finally, it returns a success message indicating that the registration was successful.
+Variables
+
+$firstName: The user's first name
+$lastName: The user's last name
+$number: The user's phone number
+$email: The user's email address
+$password: The user's password
+$confirmPassword: The user's confirmed password
+$hashNumber: The hashed phone number
+$postData: An array of the posted data
+$newFile: The file name to write the data to
+$file: The file handle to write to
+Functions
+
+header(): Sets the Access-Control-Allow-Origin header
+session_start(): Starts a new session
+filter_var(): Validates the email format
+md5(): Hashes the phone number
+json_encode(): Encodes the data in JSON format
+fwrite(): Writes the data to the file
+fclose(): Closes the file handle

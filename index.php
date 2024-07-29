@@ -11,18 +11,7 @@ session_start();
 </head>
 
 <body>
-    <?php
-    if(isset($_SESSION['error']))
-    {
-        echo "<p>". $_SESSION['error']. "</p>";
-        unset($_SESSION['error']);
-    }
-    if(isset($_SESSION['success']))
-    {
-        echo "<p>". $_SESSION['success']. "</p>";
-        unset($_SESSION['success']);
-    }
-    ?>
+
 
     <form action="sign_up.php" method="post">
         <label for="firstname">First Name:</label>
